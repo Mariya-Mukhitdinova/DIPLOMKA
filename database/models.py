@@ -7,7 +7,7 @@ from datetime import datetime
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False)
+    username = Column(String, nullable=False, unique=True)
     phone_number = Column(String, unique=True)
     password = Column(String, nullable=False)
     reg_date = Column(DateTime, default=datetime.now())
@@ -22,3 +22,6 @@ class Product(Base):
     price = Column(String, nullable=False)
     category = Column(String, nullable=False)
     quantity = Column(Integer, nullable=False)
+    prod_foto = Column(String)
+
+#фото продукта

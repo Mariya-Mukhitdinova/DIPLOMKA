@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+
+
+from fastapi import APIRouter, Depends, UploadFile, File
 from database.productservice import *
 
 # объект нашего компонента
@@ -18,7 +20,7 @@ async def add_product(name_prod, dict_prod, price, category, quantity):
 
 # получение всех товаров и получение информации о конкретном товаре
 @product_router.post('/products_all')
-async def products_all_db(id):
+async def products_all_db(id: int=0):
     result = get_products_db()
     if id == 0:
         return {'message': result}
@@ -28,12 +30,22 @@ async def products_all_db(id):
 
 
 # изменение инфы о товаре
+class UpdateProduct(BaseModel):
+    name_prod: Optional[str] = None
+    dict_prod: Optional[str] = None
+    category: Optional[str] = None
+    price: Optional[str] = None
+    quantity: Optional[str] = None
+
 
 @product_router.put('/edit_prod')
-async def edit_product(id, change_info, new_info):
-    result = change_info_product_db(id, change_info, new_info)
+async def edit_product(id:  int,
+                       prod_update: UpdateProduct,
+                       db: Session =Depends(get_db)):
+
+    result = change_info_prod_db(db,id,prod_update)
     if result:
-        return {'message': "Информация изменена"}
+        return {'message': "Информация о товаре изменена"}
     return {'message': result}
 
 
@@ -44,3 +56,14 @@ async def delete_prod(id):
     if result:
         return {'message': "Товар удален"}
     return {'message': result}
+
+@product_router.post('/add_photo')
+async def add_photo(id: int, prod_photo: UploadFile = File(...)):
+    with open(f'media/{prod_photo.filename}', 'wb+') as file:
+        photo_product = await prod_photo.read()
+        file.write(photo_product)
+    result = prod_photo_db(id=id, prod_photo=f'/media/{prod_photo.filename}')
+    if result:
+        return {'message': {"Фото загружено": result}}
+    return {'message': result}
+
