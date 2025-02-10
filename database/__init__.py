@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 # указываем тип и название базы данных
-SQLALCHEMY_DATABASE_URL = 'sqlite:///data.db'
+SQLALCHEMY_DATABASE_URL = 'sqlite:///data3.db'
 # создаем движок нашей базы данных
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 # создание функции для создания сессий

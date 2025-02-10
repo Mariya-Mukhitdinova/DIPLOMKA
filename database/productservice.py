@@ -33,7 +33,6 @@ def concretniy_product_db(id):
         return "Товар не найден"
 
 
-
 # изменение данных о продукте
 class UpdateProduct(BaseModel):
     name_prod: Optional[str] = None
@@ -56,8 +55,6 @@ def change_info_prod_db(db: Session, id: int, product_update: UpdateProduct):
     return db_product
 
 
-
-
 # удаление товара
 def delete_prod_db(id):
     with next(get_db()) as db:
@@ -69,17 +66,26 @@ def delete_prod_db(id):
         return "Товар не найден"
 
 
-def prod_photo_db(id, prod_photo):
+# добавление фото продукта
+def prod_photo_db(id, prod_path):
     db = next(get_db())
 
-    checker = db.query(Product).filter_by(id=id).first()
-    if checker:
-        checker.prod_photo = prod_photo
-        db.commit()
-        return {'message': checker}
-    else:
+    product = db.query(Product).filter_by(id=id).first()
+    if not product:
         return {'message': 'товар не найден'}
+    new_photo = Photo(photo_path=prod_path, prod_id=id)
+    db.add(new_photo)
+    db.commit()
+    return {'message': 'Фото успешно добавлено', 'photo': new_photo}
 
 
 
-
+# def del_prod_photo_db(id):
+#     db = next(get_db())
+#
+#     checker = db.query(Product).filter_by(id=id).first()
+#     if checker:
+#         db.delete(checker)
+#         db.commit()
+#     else:
+#         return {'message': 'Ошибка'}

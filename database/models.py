@@ -1,5 +1,7 @@
+from sqlalchemy.orm import relationship
+
 from database import Base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime,ForeignKey
 from datetime import datetime
 
 
@@ -10,7 +12,7 @@ class User(Base):
     username = Column(String, nullable=False, unique=True)
     phone_number = Column(String, unique=True)
     password = Column(String, nullable=False)
-    reg_date = Column(DateTime, default=datetime.now())
+    reg_date = Column(DateTime, default=datetime.now)
 
 
 # модель товаров
@@ -22,6 +24,20 @@ class Product(Base):
     price = Column(String, nullable=False)
     category = Column(String, nullable=False)
     quantity = Column(Integer, nullable=False)
-    prod_foto = Column(String)
 
-#фото продукта
+class Photo(Base):
+    __tablename__ = 'photos'
+    photo_id = Column(Integer, primary_key=True, autoincrement=True)
+    photo_path = Column(String, nullable=False)
+    prod_id = Column(Integer, ForeignKey('products.id'), nullable=True)
+    product = relationship("Product", lazy="subquery")
+# uvicorn main:app --reload запуск проекта
+class Cart(Base):
+    __tablename__ = "cart_items"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer,ForeignKey("users.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity = Column(Integer, default=1)
+    user = relationship("User")
+    product = relationship("Product")
+

@@ -1,7 +1,6 @@
-
-
 from fastapi import APIRouter, Depends, UploadFile, File
 from database.productservice import *
+import os
 
 # объект нашего компонента
 product_router = APIRouter(prefix='/product',
@@ -57,13 +56,28 @@ async def delete_prod(id):
         return {'message': "Товар удален"}
     return {'message': result}
 
+#добавление фото продукта
 @product_router.post('/add_photo')
 async def add_photo(id: int, prod_photo: UploadFile = File(...)):
-    with open(f'media/{prod_photo.filename}', 'wb+') as file:
+    os.makedirs('media', exist_ok=True)
+    file_path = f'media/{prod_photo.filename}'
+    with open(file_path, 'wb+') as file:
         photo_product = await prod_photo.read()
         file.write(photo_product)
-    result = prod_photo_db(id=id, prod_photo=f'/media/{prod_photo.filename}')
-    if result:
-        return {'message': {"Фото загружено": result}}
-    return {'message': result}
+    result = prod_photo_db(id=id, prod_path=f'/media/{prod_photo.filename}')
+    return {'message': "Фото загружено", 'photo': result}  # Добавил более ясное сообщение
+
+
+
+
+
+
+
+   # @product_router.delete('/dell_photo')
+# async def del_photo(id):
+#     result = del_prod_photo_db(id)
+#     if result:
+#           return {'message': "Картинка удалена"}
+#     return {'message': result}
+
 
